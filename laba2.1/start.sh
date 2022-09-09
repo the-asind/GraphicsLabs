@@ -1,1 +1,1 @@
-g++ main.cpp -lGL -lGLU -lglut && ./a.out 
+g++ laba2.1main.cpp -lGL -lGLU -lglut && ./a.out 
