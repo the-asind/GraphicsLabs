@@ -1,6 +1,7 @@
 #include <windows.h> /*подключать библиотеку следует только под Windows
 под Linux используем start.sh с кодом 
-«g++ main.cpp -lGL -lGLU -lglut && ./a.out»*/
+g++ laba2.1main.cpp -lGL -lGLU -lglut && ./a.out
+*/
 #include "point.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
