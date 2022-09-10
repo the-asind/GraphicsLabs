@@ -1,17 +1,34 @@
-/*#include <windows.h> подключать библиотеку следует только под Windows
+#include <windows.h> /*подключать библиотеку следует только под Windows
 под Linux используем start.sh с кодом
 g++ laba1main.cpp -lGL -lGLU -lglut && ./a.out
 */
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <iostream>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
+
 int viewportSize = WINDOW_WIDTH;
+std::string title = "Gorshkov Kashaev Osokin ABT-113";
+
+void drawString(std::string str, double posX, double posY) {
+  int i = 0;
+  glColor3d(1, 1, 1);
+
+  while (str[i] != '\0') {
+    glRasterPos2d(posX, posY);
+    glutBitmapCharacter(GLUT_BITMAP_8_BY_13, str[i]);
+    posX += 0.12;
+    i++;
+  }
+}
 
 void  display(void)
 {
+    drawString(title, -4, 5.5);
+    
     // Красный проволочный тор
     glColor3d(1, 0, 0);
     glViewport(0, 0, 400, 400);
@@ -31,7 +48,7 @@ void  display(void)
     glColor3d(1, 1, 0);
     glViewport(400, 400, 400, 400);
     glutSolidTeapot(2);
-
+    
     glutSwapBuffers();
     // glFlush();
 }
