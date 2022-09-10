@@ -69,11 +69,11 @@ void init(void)
 }
 
 static void reshape(int w, int h) {
-    //viewportSize = min(w, h);
-    //int x = (w - viewportSize) / 2;
-    //int y = (h - viewportSize) / 2;
-    //glViewport(x, y, viewportSize, viewportSize);
-    //init();
+    viewportSize = min(w, h);
+    int x = (w - viewportSize) / 2;
+    int y = (h - viewportSize) / 2;
+    glViewport(x, y, viewportSize, viewportSize);
+    init();
 }
 
 int main(int argc, char** argv)
