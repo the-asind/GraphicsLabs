@@ -10,7 +10,7 @@ g++ laba1main.cpp -lGL -lGLU -lglut && ./a.out
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
 
-int viewportSize = WINDOW_WIDTH;
+double viewportSize = WINDOW_WIDTH;
 std::string title = "Gorshkov Kashaev Osokin ABT-113";
 
 void drawString(std::string str, double posX, double posY) {

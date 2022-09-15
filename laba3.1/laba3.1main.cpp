@@ -7,85 +7,187 @@ g++ laba3.1main.cpp -lGL -lGLU -lglut && ./a.out
 #include "../glut.h"
 #include <iostream>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
 
-int viewportSize = WINDOW_WIDTH;
-std::string title = "Gorshkov Kashaev Osokin ABT-113";
 
-void drawString(std::string str, double posX, double posY) {
-    int i = 0;
-    glColor3d(1, 1, 1);
 
-    while (str[i] != '\0') {
-        glRasterPos2d(posX, posY);
-        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, str[i]);
-        posX += 0.12;
-        i++;
-    }
+//Это неработающий код на снеговика, он не связан с лабами
+
+
+
+
+#include <math.h>
+#include <stdlib.h> 
+
+// угол поворота камеры
+float angle = 0.0;
+// координаты вектора направления движения камеры
+float lx = 0.0f, lz = -1.0f;
+// XZ позиция камеры
+float x = 0.0f, z = 5.0f;
+//Ключи статуса камеры. Переменные инициализируются нулевыми значениями
+//когда клавиши не нажаты
+float deltaAngle = 0.0f;
+float deltaMove = 0;
+int xOrigin = -1;
+
+void changeSize(int w, int h) {
+	// предотвращение деления на ноль
+	if (h == 0)
+		h = 1;
+	float ratio = w * 1.0 / h;
+	// используем матрицу проекции
+	glMatrixMode(GL_PROJECTION);
+	// обнуляем матрицу
+	glLoadIdentity();
+	// установить параметры вьюпорта
+	glViewport(0, 0, w, h);
+	// установить корректную перспективу
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	// вернуться к матрице проекции
+	glMatrixMode(GL_MODELVIEW);
 }
 
-void  display(void)
+void drawSnowMan() {
+	glColor3f(0.0f, 1.0f, 1.0f);
+	// тело снеговика
+	glTranslatef(0.0f, 0.75f, 0.0f);
+	glutSolidSphere(0.75f, 20, 20);
+	// голова снеговика
+	glTranslatef(0.0f, 1.0f, 0.0f);
+	glutSolidSphere(0.25f, 20, 20);
+	// глаза снеговика
+	glPushMatrix();
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glTranslatef(0.05f, 0.10f, 0.18f);
+	glutSolidSphere(0.05f, 10, 10);
+	glTranslatef(-0.1f, 0.0f, 0.0f);
+	glutSolidSphere(0.05f, 10, 10);
+	glPopMatrix();
+	// нос снеговика
+	glColor3f(1.0f, 0.5f, 0.5f);
+	glRotatef(0.0f, 1.0f, 0.0f, 0.0f);
+	glutSolidCone(0.08f, 0.5f, 10, 2);
+}
+
+void computePos(float deltaMove)
 {
-    drawString(title, -4, 5.5);
-    // За шаблон взята первая лаба
-    // Красный проволочный тор
-    glColor3d(1, 0, 0);
-    glViewport(0, 0, 400, 400);
-    glutWireTorus(1, 3, 32, 32);
-
-    // Зеленая сфера
-    glColor3d(0, 1, 0);
-    glViewport(400, 0, 400, 400);
-    glutSolidSphere(2, 128, 128);
-
-    // Синий куб
-    glColor3d(0, 0, 1);
-    glViewport(0, 400, 400, 400);
-    glutSolidCube(4);
-
-    // Желтый чайник
-    glColor3d(1, 1, 0);
-    glViewport(400, 400, 400, 400);
-    glutSolidTeapot(2);
-
-    glutSwapBuffers();
-    // glFlush();
+	x += deltaMove * lx * 0.1f;
+	z += deltaMove * lz * 0.1f;
 }
 
-void init(void)
-{
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.12, 0.13, 0.22, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-5.0, 5.0, -5.0, 5.0, 2.0, 12.0);
-    gluLookAt(0, 0, 5, 0, 1, 0, 0, 1, 0);
-    glMatrixMode(GL_MODELVIEW);
+void renderScene(void) {
+	if (deltaMove)
+		computePos(deltaMove);
+	//очистить буфер цвета и глубины
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// обнулить трансформацию
+	glLoadIdentity();
+	// установить камеру
+	gluLookAt(x, 1.0f, z,
+		x + lx, 1.0f, z + lz,
+		0.0f, 1.0f, 0.0f);
+	// нарисуем "землю"
+	glColor3f(0.1f, 0.9f, 0.9f);
+	// полигон (plaine)
+	glBegin(GL_QUADS);
+	glVertex3f(-100.0f, 0.0f, -100.0f);
+	glVertex3f(-100.0f, 0.0f, 100.0f);
+	glVertex3f(100.0f, 0.0f, 100.0f);
+	glVertex3f(100.0f, 0.0f, -100.0f);
+	glEnd();
+	// Нарисуем 64 снеговика
+	for (int i = -4; i < 4; i++)
+		for (int j = -4; j < 4; j++)
+		{
+			glPushMatrix();
+			glTranslatef(i * 5.0, 0, j * 5.0);
+			drawSnowMan();
+			glPopMatrix();
+		}
+
+	glutSwapBuffers();
 }
 
-static void reshape(int w, int h) {
-    viewportSize = min(w, h);
-    int x = (w - viewportSize) / 2;
-    int y = (h - viewportSize) / 2;
-    glViewport(x, y, viewportSize, viewportSize);
-    init();
+void processNormalKeys(unsigned char key, int xx, int yy) {
+
+	if (key == 27)
+		exit(0);
 }
 
-int main(int argc, char** argv)
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowPosition(50, 10);
-    glutInitWindowSize(800, 800);
-    glutCreateWindow("Lab 1");
-    glutReshapeFunc(reshape);
-    init();
-    glutDisplayFunc(display);
-    glutMainLoop();
-    return 0;
+void pressKey(int key, int xx, int yy) {
+
+	switch (key) {
+	case GLUT_KEY_UP: deltaMove = 0.5f; break;
+	case GLUT_KEY_DOWN: deltaMove = -0.5f; break;
+	}
+}
+
+void releaseKey(int key, int x, int y) {
+
+	switch (key) {
+	case GLUT_KEY_UP:
+	case GLUT_KEY_DOWN: deltaMove = 0; break;
+	}
+}
+
+void mouseMove(int x, int y) {
+
+	// this will only be true when the left button is down
+	if (xOrigin >= 0) {
+
+		// update deltaAngle
+		deltaAngle = (x - xOrigin) * 0.001f;
+
+		// update camera's direction
+		lx = sin(angle + deltaAngle);
+		lz = -cos(angle + deltaAngle);
+	}
+}
+
+void mouseButton(int button, int state, int x, int y) {
+
+	// only start motion if the left button is pressed
+	if (button == GLUT_LEFT_BUTTON) {
+
+		// when the button is released
+		if (state == GLUT_UP) {
+			angle += deltaAngle;
+			xOrigin = -1;
+		}
+		else {// state = GLUT_DOWN
+			xOrigin = x;
+		}
+	}
+}
+
+int main(int argc, char** argv) {
+
+	// инициализация GLUT и создание окна
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition(100, 100);
+	glutInitWindowSize(400, 400);
+	glutCreateWindow("Урок - 7");
+
+	// регистрация
+	glutDisplayFunc(renderScene);
+	glutReshapeFunc(changeSize);
+	glutIdleFunc(renderScene);
+
+	glutIgnoreKeyRepeat(1);
+	glutKeyboardFunc(processNormalKeys);
+	glutSpecialFunc(pressKey);
+	glutSpecialUpFunc(releaseKey);
+
+	// регистрируем две новые функции
+	glutMouseFunc(mouseButton);
+	glutMotionFunc(mouseMove);
+
+	// OpenGL - инициализация функции теста
+	glEnable(GL_DEPTH_TEST);
+
+	// главный цикл
+	glutMainLoop();
+
+	return 0;
 }

@@ -10,7 +10,7 @@ g++ laba2main.cpp -lGL -lGLU -lglut && ./a.out
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
 
-int viewportSize = WINDOW_WIDTH;
+double viewportSize = WINDOW_WIDTH;
 
 void drawString(std::string str, double posX, double posY) {
   int i = 0;

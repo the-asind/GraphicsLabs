@@ -18,7 +18,7 @@ std::string title = "Gorshkov Osokin Kashaev ABT-113\0";
 std::vector<Point> startPoints = { Point(-5.0, -5.0), Point(0.0, 5.0),
                                   Point(5.0, -5.0) };
 
-int viewportSize = WINDOW_WIDTH;
+double viewportSize = WINDOW_WIDTH;
 
 
 Point getMiddle(Point p1, Point p2) {
