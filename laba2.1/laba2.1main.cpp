@@ -5,7 +5,7 @@ g++ laba2.1main.cpp -lGL -lGLU -lglut && ./a.out
 #include "point.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include "../glut.h"
 #include <iostream>
 #include <vector>
 

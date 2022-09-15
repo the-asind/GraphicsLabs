@@ -4,7 +4,7 @@ g++ laba2main.cpp -lGL -lGLU -lglut && ./a.out
 */
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include "../glut.h"
 #include <iostream>
 
 #define WINDOW_WIDTH 800
