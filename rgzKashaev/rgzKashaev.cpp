@@ -8,7 +8,7 @@ g++ rgzKashaev.cpp -lGL -lGLU -lglut && ./a.out
 #include <iostream>
 #include <vector>
 
-#define ITERATIONS_COUNT 10000
+#define ITERATIONS_COUNT 1000
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
 
@@ -36,12 +36,12 @@ void fract(void) {
 
     const double x0 = 0, y0 = 0, pi = 3.1415, b = 10, c = 2;
     const int count = ITERATIONS_COUNT;
-    for (int i = 1; i < count; i++)
+    for (int i = 1; i <= count; i++)
     {
         x = x0 + (i / c * cos(i / b));
         y = y0 + (i / c * sin(i / b));
         a = i / b;
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 4; j++)
         {
             px[j] = x + (a * cos(i / b + pi * j / 2));
             py[j] = y + (a * sin(i / b + pi * j / 2));
@@ -53,6 +53,15 @@ void fract(void) {
             glVertex2d(px[1], py[1]);
             glVertex2d(px[2], py[2]);
             glVertex2d(px[3], py[3]);
+        glEnd();
+        glEnable(GL_LINE_SMOOTH | GL_LINE_STIPPLE);
+        glBegin(GL_LINE_STRIP);
+            glColor3d(0, 0, 0);
+            glVertex2d(px[0], py[0]);
+            glVertex2d(px[1], py[1]);
+            glVertex2d(px[2], py[2]);
+            glVertex2d(px[3], py[3]);
+            glVertex2d(px[0], py[0]);
         glEnd();
 
     }
