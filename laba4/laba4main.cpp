@@ -14,9 +14,9 @@ double viewportSize = WINDOW_WIDTH;
 double windowCurrentWidth = WINDOW_WIDTH;
 double windowCurrentHeight = WINDOW_HEIGHT;
 
-GLfloat vertices[][3] = { {-0.5,-0.5,-0.5},{0.5,-0.5,-0.5},
-{0.5,0.5,-0.5},{-0.5,0.5,-0.5},{-0.5,-0.5,0.5},
-{0.5,-0.5,0.5},{0.5,0.5,0.5},{-0.5,0.5,0.5} };
+GLfloat vertices[][3] = { {-1.0,-1.0,-1.0},{1.0,-1.0,-1.0},
+{1.0,1.0,-1.0},{-1.0,1.0,-1.0},{-1.0,-1.0,1.0},
+{1.0,-1.0,1.0},{1.0,1.0,1.0},{-1.0,1.0,1.0} };
 
 GLfloat colors[][3] = { {0.0,0.0,0.0},{1.0,0.0,0.0},
 {1.0,1.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0},
@@ -24,7 +24,10 @@ GLfloat colors[][3] = { {0.0,0.0,0.0},{1.0,0.0,0.0},
 
 
 char title[] = "Gorshkov Kashaev Osokin ABT-113";
-double X = 0, Y = 0;
+double degree = 1.5708, r = 4;
+double X = r * cos(degree), Y = r * sin(degree);
+const double speed = 0.0174 * 2;
+
 void drawString(float x, float y, float z, void* font, char* string)
 {
 		glColor3f(0.478, 0.56, 0.086);
@@ -63,11 +66,13 @@ void display(void)
 { 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glLoadIdentity();
-		
-		glRotatef(X, 1.0, 0.0, 0.0);
-		glRotatef(Y, 0.0, 1.0, 0.0);
-		colorcube();
 
+		double newX = r * cos(degree), newZ = r * sin(degree); 
+		
+		gluPerspective(60, 1, 0.5, 100);
+		gluLookAt(newX, 0, newZ, 0, 0, 0, 0, 1, 0);
+		drawString(0, 2, 0,GLUT_BITMAP_8_BY_13, title);
+		colorcube();
 		glutSwapBuffers();
 }
 
@@ -83,22 +88,19 @@ void init(void)
 void reshape(int w, int h)
 {
 }
-void specialKeys(int key, int x, int y) {
 
-	 
+void specialKeys(int key, int x, int y) {
 		if (key == GLUT_KEY_RIGHT)
-				Y += 5;
+				degree += speed;
 
 		else if (key == GLUT_KEY_LEFT)
-				Y -= 5;
+				degree -= speed;
 
 		else if (key == GLUT_KEY_UP)
-				X += 5;
-
+				r--;
+		
 		else if (key == GLUT_KEY_DOWN)
-				X -= 5;
-
-		//Обновление изображения
+				r++;
 		glutPostRedisplay();
 
 }
