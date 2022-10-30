@@ -24,8 +24,8 @@ GLfloat colors[][3] = { {0.0,0.0,0.0},{1.0,0.0,0.0},
 
 
 char title[] = "Gorshkov Kashaev Osokin ABT-113";
-double degree = 1.5708, r = 4;
-double X = r * cos(degree), Y = r * sin(degree);
+double degree = 1.5708, teta = 1.5708, r = 4;
+
 const double speed = 0.0174 * 2;
 
 void drawString(float x, float y, float z, void* font, char* string)
@@ -67,10 +67,10 @@ void display(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glLoadIdentity();
 
-		double newX = r * cos(degree), newZ = r * sin(degree); 
-		
+		double x = r * sin(teta) * cos(degree), z = r * sin(teta) * sin(degree), y = r * cos(teta); 
+			
 		gluPerspective(60, 1, 0.5, 100);
-		gluLookAt(newX, 0, newZ, 0, 0, 0, 0, 1, 0);
+		gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 		drawString(0, 2, 0,GLUT_BITMAP_8_BY_13, title);
 		colorcube();
 		glutSwapBuffers();
@@ -97,10 +97,10 @@ void specialKeys(int key, int x, int y) {
 				degree -= speed;
 
 		else if (key == GLUT_KEY_UP)
-				r--;
+				teta += speed;
 		
 		else if (key == GLUT_KEY_DOWN)
-				r++;
+				teta -= speed;
 		glutPostRedisplay();
 
 }
