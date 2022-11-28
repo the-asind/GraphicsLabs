@@ -1,91 +1,139 @@
-﻿#include <windows.h> /*подключать библиотеку следует только под Windows
-под Linux используем start.sh с кодом
-g++ laba5main.cpp -lGL -lGLU -lglut && ./a.out
-*/
-#include <GL/gl.h>
+﻿#include <GL/gl.h>
 #include <GL/glu.h>
-#include "../glut.h"
-#include <iostream>
+#include <GL/glut.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define N 30
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
+GLfloat vertices[][3] = {
+    {-1.0, -1.0, -1.0}, {1.0, -1.0, -1.0}, {1.0, 1.0, -1.0}, {-1.0, 1.0, -1.0},
+    {-1.0, -1.0, 1.0},  {1.0, -1.0, 1.0},  {1.0, 1.0, 1.0},  {-1.0, 1.0, 1.0}};
 
-int viewportSize = WINDOW_WIDTH;
-std::string title = "Gorshkov Kashaev Osokin ABT-113";
+GLint window_width = 800, window_height = 800;
+char title[] = "Gorshkov Kashaev Osokin ABT-113";
 
-void drawString(std::string str, double posX, double posY) {
-    int i = 0;
-    glColor3d(1, 1, 1);
+double degree = 1.5708, teta = 1.5708, r = 4;
 
-    while (str[i] != '\0') {
-        glRasterPos2d(posX, posY);
-        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, str[i]);
-        posX += 0.12;
-        i++;
-    }
+const double speed = 0.0174 * 2;
+
+void drawString(float x, float y, float z, void *font, char *string) {
+  glColor3f(0.478, 0.56, 0.086);
+  char *c;
+  glRasterPos3f(x, y, z);
+  for (c = string; *c != '\0'; c++) {
+    glutBitmapCharacter(font, *c);
+  }
+}
+void polygon(int a, int b, int c, int d) {
+  glBegin(GL_POLYGON);
+  glTexCoord2d(0, 1);
+  glVertex3fv(vertices[a]);
+  glTexCoord2d(1, 1);
+  glVertex3fv(vertices[b]);
+  glTexCoord2d(1, 0);
+  glVertex3fv(vertices[c]);
+  glTexCoord2d(0, 0);
+  glVertex3fv(vertices[d]);
+  glEnd();
 }
 
-void  display(void)
-{
-    drawString(title, -4, 5.5);
-    // За шаблон взята первая лаба
-    // Красный проволочный тор
-    glColor3d(1, 0, 0);
-    glViewport(0, 0, 400, 400);
-    glutWireTorus(1, 3, 32, 32);
+void colorcube(unsigned int brickText) {
+  glEnable(GL_TEXTURE_2D);
+  glColor3d(1, 1, 1);
 
-    // Зеленая сфера
-    glColor3d(0, 1, 0);
-    glViewport(400, 0, 400, 400);
-    glutSolidSphere(2, 128, 128);
-
-    // Синий куб
-    glColor3d(0, 0, 1);
-    glViewport(0, 400, 400, 400);
-    glutSolidCube(4);
-
-    // Желтый чайник
-    glColor3d(1, 1, 0);
-    glViewport(400, 400, 400, 400);
-    glutSolidTeapot(2);
-
-    glutSwapBuffers();
-    // glFlush();
+  glBindTexture(GL_TEXTURE_2D, brickText);
+  polygon(0, 3, 2, 1);
+  polygon(2, 3, 7, 6);
+  polygon(0, 4, 7, 3);
+  polygon(1, 2, 6, 5);
+  polygon(4, 5, 6, 7);
+  polygon(0, 1, 5, 4);
 }
 
-void init(void)
-{
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.12, 0.13, 0.22, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-5.0, 5.0, -5.0, 5.0, 2.0, 12.0);
-    gluLookAt(0, 0, 5, 0, 1, 0, 0, 1, 0);
-    glMatrixMode(GL_MODELVIEW);
+unsigned int newTexture(const char texture_path[]) {
+  unsigned int texture;
+
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  int width, height, nrChannels;
+  unsigned char *data =
+      stbi_load(texture_path, &width, &height, &nrChannels, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, data);
+
+  return texture;
 }
 
-static void reshape(int w, int h) {
-    viewportSize = min(w, h);
-    int x = (w - viewportSize) / 2;
-    int y = (h - viewportSize) / 2;
-    glViewport(x, y, viewportSize, viewportSize);
-    init();
+void display() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  char texture_path[N] = "./brick-wall-texture.jpg";
+  unsigned char texture_data = newTexture(texture_path);
+
+  glMatrixMode(GL_VIEWPORT);
+  glLoadIdentity();
+
+  double x = r * sin(teta) * cos(degree), y = r * cos(teta),
+         z = r * sin(teta) * sin(degree);
+
+  gluPerspective(60, 1, 0.5, 100);
+  gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
+
+  drawString(0, 1.5, 0, GLUT_BITMAP_8_BY_13, title);
+  colorcube(texture_data);
+
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
+  glutSwapBuffers();
 }
 
-int main(int argc, char** argv)
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowPosition(50, 10);
-    glutInitWindowSize(800, 800);
-    glutCreateWindow("Lab 1");
-    glutReshapeFunc(reshape);
-    init();
-    glutDisplayFunc(display);
-    glutMainLoop();
-    return 0;
+void reshape(GLint width, GLint height) {
+  window_width = width;
+  window_height = height;
+  glViewport(0, 0, width, height);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  gluOrtho2D(-6, 6, -6, 6);
+}
+
+void specialKeys(int key, int x, int y) {
+  if (key == GLUT_KEY_RIGHT)
+    degree += speed;
+
+  else if (key == GLUT_KEY_LEFT)
+    degree -= speed;
+
+  else if (key == GLUT_KEY_UP)
+    teta += speed;
+
+  else if (key == GLUT_KEY_DOWN)
+    teta -= speed;
+  glutPostRedisplay();
+}
+
+void init(void) {
+  glClearColor(0.9, 0.95, 0.67, 0.0);
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_DEPTH_TEST);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glMatrixMode(GL_MODELVIEW);
+}
+
+int main(int argc, char **argv) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitWindowPosition(100, 100);
+  glutInitWindowSize(800, 800);
+  glutCreateWindow("Cube with textures");
+  init();
+  glutSpecialFunc(specialKeys);
+  glutDisplayFunc(display);
+  glutReshapeFunc(reshape);
+  glutMainLoop();
+  return 0;
 }
